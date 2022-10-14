@@ -1,0 +1,1379 @@
+2022-09-13 21:44:43,562 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.7.7 (default, May  7 2020, 21:25:33) [GCC 7.3.0]
+CUDA available: True
+GPU 0,1: GeForce RTX 3090
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.0, V11.0.194
+GCC: gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0
+PyTorch: 1.7.0+cu110
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.6.0 (Git Hash 5ef631a030a6f73131c77892041042805a06064f)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.0
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80
+  - CuDNN 8.0.4
+  - Magma 2.5.2
+  - Build settings: BLAS=MKL, BUILD_TYPE=Release, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DUSE_VULKAN_WRAPPER -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, USE_CUDA=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.8.1+cu110
+OpenCV: 4.6.0
+MMCV: 1.6.1
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 11.0
+MMDetection: 2.25.1+df28da9
+------------------------------------------------------------
+
+2022-09-13 21:44:44,022 - mmdet - INFO - Distributed training: True
+2022-09-13 21:44:44,460 - mmdet - INFO - Config:
+dataset_type = 'CocoDataset'
+data_root = '/home/hhn/mmdetection/20220830'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(type='Resize', img_scale=(1500, 1000), keep_ratio=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(1500, 1000),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=4,
+    workers_per_gpu=2,
+    train=dict(
+        type='CocoDataset',
+        ann_file='/home/hhn/mmdetection/20220830/annotations_lb201/train2.json',
+        img_prefix='/home/hhn/mmdetection/20220830/lb201/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(type='Resize', img_scale=(1500, 1000), keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.5),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+        ]),
+    val=dict(
+        type='CocoDataset',
+        ann_file='/home/hhn/mmdetection/20220830/annotations_lb201/val2.json',
+        img_prefix='/home/hhn/mmdetection/20220830/lb201/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(1500, 1000),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='CocoDataset',
+        ann_file='/home/hhn/mmdetection/20220830/annotations_lb201/val2.json',
+        img_prefix='/home/hhn/mmdetection/20220830/lb201/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(1500, 1000),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+evaluation = dict(interval=1, metric='bbox')
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[8, 11])
+runner = dict(type='EpochBasedRunner', max_epochs=12)
+checkpoint_config = dict(interval=1)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+custom_hooks = [dict(type='NumClassCheckHook')]
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = '/home/hhn/mmdetection/pretrained/cascade_rcnn_r50_fpn_1x_coco_20200316-3dc56deb.pth'
+resume_from = None
+workflow = [('train', 1)]
+opencv_num_threads = 0
+mp_start_method = 'fork'
+auto_scale_lr = dict(enable=False, base_batch_size=8)
+model = dict(
+    type='CascadeRCNN',
+    backbone=dict(
+        type='ResNet',
+        depth=50,
+        num_stages=4,
+        out_indices=(0, 1, 2, 3),
+        frozen_stages=1,
+        norm_cfg=dict(type='BN', requires_grad=True),
+        norm_eval=True,
+        style='pytorch',
+        init_cfg=None),
+    neck=dict(
+        type='FPN',
+        in_channels=[256, 512, 1024, 2048],
+        out_channels=256,
+        num_outs=5),
+    rpn_head=dict(
+        type='RPNHead',
+        in_channels=256,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[8],
+            ratios=[0.5, 1.0, 2.0],
+            strides=[4, 8, 16, 32, 64]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0]),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.0)),
+    roi_head=dict(
+        type='CascadeRoIHead',
+        num_stages=3,
+        stage_loss_weights=[1, 0.5, 0.25],
+        bbox_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        bbox_head=[
+            dict(
+                type='Shared2FCBBoxHead',
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=8,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.1, 0.1, 0.2, 0.2]),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='Shared2FCBBoxHead',
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=8,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.05, 0.05, 0.1, 0.1]),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='Shared2FCBBoxHead',
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=8,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.033, 0.033, 0.067, 0.067]),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
+        ]),
+    train_cfg=dict(
+        rpn=dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.3,
+                min_pos_iou=0.3,
+                match_low_quality=True,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=256,
+                pos_fraction=0.5,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=False),
+            allowed_border=0,
+            pos_weight=-1,
+            debug=False),
+        rpn_proposal=dict(
+            nms_pre=2000,
+            max_per_img=2000,
+            nms=dict(type='nms', iou_threshold=0.7),
+            min_bbox_size=0),
+        rcnn=[
+            dict(
+                assigner=dict(
+                    type='MaxIoUAssigner',
+                    pos_iou_thr=0.5,
+                    neg_iou_thr=0.5,
+                    min_pos_iou=0.5,
+                    match_low_quality=False,
+                    ignore_iof_thr=-1),
+                sampler=dict(
+                    type='RandomSampler',
+                    num=512,
+                    pos_fraction=0.25,
+                    neg_pos_ub=-1,
+                    add_gt_as_proposals=True),
+                pos_weight=-1,
+                debug=False),
+            dict(
+                assigner=dict(
+                    type='MaxIoUAssigner',
+                    pos_iou_thr=0.6,
+                    neg_iou_thr=0.6,
+                    min_pos_iou=0.6,
+                    match_low_quality=False,
+                    ignore_iof_thr=-1),
+                sampler=dict(
+                    type='RandomSampler',
+                    num=512,
+                    pos_fraction=0.25,
+                    neg_pos_ub=-1,
+                    add_gt_as_proposals=True),
+                pos_weight=-1,
+                debug=False),
+            dict(
+                assigner=dict(
+                    type='MaxIoUAssigner',
+                    pos_iou_thr=0.7,
+                    neg_iou_thr=0.7,
+                    min_pos_iou=0.7,
+                    match_low_quality=False,
+                    ignore_iof_thr=-1),
+                sampler=dict(
+                    type='RandomSampler',
+                    num=512,
+                    pos_fraction=0.25,
+                    neg_pos_ub=-1,
+                    add_gt_as_proposals=True),
+                pos_weight=-1,
+                debug=False)
+        ]),
+    test_cfg=dict(
+        rpn=dict(
+            nms_pre=1000,
+            max_per_img=1000,
+            nms=dict(type='nms', iou_threshold=0.7),
+            min_bbox_size=0),
+        rcnn=dict(
+            score_thr=0.05,
+            nms=dict(type='nms', iou_threshold=0.5),
+            max_per_img=100)))
+work_dir = './work_dirs/cascade_rcnn_r50_fpn'
+auto_resume = False
+gpu_ids = range(0, 2)
+
+2022-09-13 21:44:44,460 - mmdet - INFO - Set random seed to 0, deterministic: False
+2022-09-13 21:44:45,039 - mmdet - INFO - initialize ResNet with init_cfg [{'type': 'Kaiming', 'layer': 'Conv2d'}, {'type': 'Constant', 'val': 1, 'layer': ['_BatchNorm', 'GroupNorm']}]
+2022-09-13 21:44:45,298 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,300 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,301 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,303 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,304 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,306 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,307 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,310 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,312 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,314 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,316 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,317 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,319 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,325 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,329 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,333 - mmdet - INFO - initialize Bottleneck with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm3'}}
+2022-09-13 21:44:45,365 - mmdet - INFO - initialize FPN with init_cfg {'type': 'Xavier', 'layer': 'Conv2d', 'distribution': 'uniform'}
+2022-09-13 21:44:45,386 - mmdet - INFO - initialize RPNHead with init_cfg {'type': 'Normal', 'layer': 'Conv2d', 'std': 0.01}
+2022-09-13 21:44:45,392 - mmdet - INFO - initialize Shared2FCBBoxHead with init_cfg [{'type': 'Normal', 'std': 0.01, 'override': {'name': 'fc_cls'}}, {'type': 'Normal', 'std': 0.001, 'override': {'name': 'fc_reg'}}, {'type': 'Xavier', 'distribution': 'uniform', 'override': [{'name': 'shared_fcs'}, {'name': 'cls_fcs'}, {'name': 'reg_fcs'}]}]
+2022-09-13 21:44:45,485 - mmdet - INFO - initialize Shared2FCBBoxHead with init_cfg [{'type': 'Normal', 'std': 0.01, 'override': {'name': 'fc_cls'}}, {'type': 'Normal', 'std': 0.001, 'override': {'name': 'fc_reg'}}, {'type': 'Xavier', 'distribution': 'uniform', 'override': [{'name': 'shared_fcs'}, {'name': 'cls_fcs'}, {'name': 'reg_fcs'}]}]
+2022-09-13 21:44:45,579 - mmdet - INFO - initialize Shared2FCBBoxHead with init_cfg [{'type': 'Normal', 'std': 0.01, 'override': {'name': 'fc_cls'}}, {'type': 'Normal', 'std': 0.001, 'override': {'name': 'fc_reg'}}, {'type': 'Xavier', 'distribution': 'uniform', 'override': [{'name': 'shared_fcs'}, {'name': 'cls_fcs'}, {'name': 'reg_fcs'}]}]
+Name of parameter - Initialization information
+
+backbone.conv1.weight - torch.Size([64, 3, 7, 7]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.bn1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.bn1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.0.conv1.weight - torch.Size([64, 64, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer1.0.bn1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.0.bn1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.0.conv2.weight - torch.Size([64, 64, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer1.0.bn2.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.0.bn2.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.0.conv3.weight - torch.Size([256, 64, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer1.0.bn3.weight - torch.Size([256]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer1.0.bn3.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.0.downsample.0.weight - torch.Size([256, 64, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer1.0.downsample.1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.0.downsample.1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.1.conv1.weight - torch.Size([64, 256, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer1.1.bn1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.1.bn1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.1.conv2.weight - torch.Size([64, 64, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer1.1.bn2.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.1.bn2.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.1.conv3.weight - torch.Size([256, 64, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer1.1.bn3.weight - torch.Size([256]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer1.1.bn3.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.2.conv1.weight - torch.Size([64, 256, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer1.2.bn1.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.2.bn1.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.2.conv2.weight - torch.Size([64, 64, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer1.2.bn2.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.2.bn2.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer1.2.conv3.weight - torch.Size([256, 64, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer1.2.bn3.weight - torch.Size([256]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer1.2.bn3.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.0.conv1.weight - torch.Size([128, 256, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.0.bn1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.0.bn1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.0.conv2.weight - torch.Size([128, 128, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.0.bn2.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.0.bn2.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.0.conv3.weight - torch.Size([512, 128, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.0.bn3.weight - torch.Size([512]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer2.0.bn3.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.0.downsample.0.weight - torch.Size([512, 256, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.0.downsample.1.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.0.downsample.1.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.1.conv1.weight - torch.Size([128, 512, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.1.bn1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.1.bn1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.1.conv2.weight - torch.Size([128, 128, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.1.bn2.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.1.bn2.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.1.conv3.weight - torch.Size([512, 128, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.1.bn3.weight - torch.Size([512]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer2.1.bn3.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.2.conv1.weight - torch.Size([128, 512, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.2.bn1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.2.bn1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.2.conv2.weight - torch.Size([128, 128, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.2.bn2.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.2.bn2.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.2.conv3.weight - torch.Size([512, 128, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.2.bn3.weight - torch.Size([512]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer2.2.bn3.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.3.conv1.weight - torch.Size([128, 512, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.3.bn1.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.3.bn1.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.3.conv2.weight - torch.Size([128, 128, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.3.bn2.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.3.bn2.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer2.3.conv3.weight - torch.Size([512, 128, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer2.3.bn3.weight - torch.Size([512]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer2.3.bn3.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.0.conv1.weight - torch.Size([256, 512, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.0.bn1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.0.bn1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.0.conv2.weight - torch.Size([256, 256, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.0.bn2.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.0.bn2.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.0.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.0.bn3.weight - torch.Size([1024]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer3.0.bn3.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.0.downsample.0.weight - torch.Size([1024, 512, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.0.downsample.1.weight - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.0.downsample.1.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.1.conv1.weight - torch.Size([256, 1024, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.1.bn1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.1.bn1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.1.conv2.weight - torch.Size([256, 256, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.1.bn2.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.1.bn2.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.1.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.1.bn3.weight - torch.Size([1024]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer3.1.bn3.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.2.conv1.weight - torch.Size([256, 1024, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.2.bn1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.2.bn1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.2.conv2.weight - torch.Size([256, 256, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.2.bn2.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.2.bn2.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.2.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.2.bn3.weight - torch.Size([1024]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer3.2.bn3.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.3.conv1.weight - torch.Size([256, 1024, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.3.bn1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.3.bn1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.3.conv2.weight - torch.Size([256, 256, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.3.bn2.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.3.bn2.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.3.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.3.bn3.weight - torch.Size([1024]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer3.3.bn3.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.4.conv1.weight - torch.Size([256, 1024, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.4.bn1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.4.bn1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.4.conv2.weight - torch.Size([256, 256, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.4.bn2.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.4.bn2.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.4.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.4.bn3.weight - torch.Size([1024]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer3.4.bn3.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.5.conv1.weight - torch.Size([256, 1024, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.5.bn1.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.5.bn1.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.5.conv2.weight - torch.Size([256, 256, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.5.bn2.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.5.bn2.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer3.5.conv3.weight - torch.Size([1024, 256, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer3.5.bn3.weight - torch.Size([1024]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer3.5.bn3.bias - torch.Size([1024]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.0.conv1.weight - torch.Size([512, 1024, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer4.0.bn1.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.0.bn1.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.0.conv2.weight - torch.Size([512, 512, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer4.0.bn2.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.0.bn2.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.0.conv3.weight - torch.Size([2048, 512, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer4.0.bn3.weight - torch.Size([2048]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer4.0.bn3.bias - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.0.downsample.0.weight - torch.Size([2048, 1024, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer4.0.downsample.1.weight - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.0.downsample.1.bias - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.1.conv1.weight - torch.Size([512, 2048, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer4.1.bn1.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.1.bn1.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.1.conv2.weight - torch.Size([512, 512, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer4.1.bn2.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.1.bn2.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.1.conv3.weight - torch.Size([2048, 512, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer4.1.bn3.weight - torch.Size([2048]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer4.1.bn3.bias - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.2.conv1.weight - torch.Size([512, 2048, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer4.2.bn1.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.2.bn1.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.2.conv2.weight - torch.Size([512, 512, 3, 3]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer4.2.bn2.weight - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.2.bn2.bias - torch.Size([512]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+backbone.layer4.2.conv3.weight - torch.Size([2048, 512, 1, 1]): 
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0 
+
+backbone.layer4.2.bn3.weight - torch.Size([2048]): 
+ConstantInit: val=0, bias=0 
+
+backbone.layer4.2.bn3.bias - torch.Size([2048]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+neck.lateral_convs.0.conv.weight - torch.Size([256, 256, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.lateral_convs.0.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+neck.lateral_convs.1.conv.weight - torch.Size([256, 512, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.lateral_convs.1.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+neck.lateral_convs.2.conv.weight - torch.Size([256, 1024, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.lateral_convs.2.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+neck.lateral_convs.3.conv.weight - torch.Size([256, 2048, 1, 1]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.lateral_convs.3.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+neck.fpn_convs.0.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.fpn_convs.0.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+neck.fpn_convs.1.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.fpn_convs.1.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+neck.fpn_convs.2.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.fpn_convs.2.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+neck.fpn_convs.3.conv.weight - torch.Size([256, 256, 3, 3]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+neck.fpn_convs.3.conv.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of CascadeRCNN  
+
+rpn_head.rpn_conv.weight - torch.Size([256, 256, 3, 3]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+rpn_head.rpn_conv.bias - torch.Size([256]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+rpn_head.rpn_cls.weight - torch.Size([3, 256, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+rpn_head.rpn_cls.bias - torch.Size([3]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+rpn_head.rpn_reg.weight - torch.Size([12, 256, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+rpn_head.rpn_reg.bias - torch.Size([12]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+roi_head.bbox_head.0.fc_cls.weight - torch.Size([9, 1024]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+roi_head.bbox_head.0.fc_cls.bias - torch.Size([9]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+roi_head.bbox_head.0.fc_reg.weight - torch.Size([4, 1024]): 
+NormalInit: mean=0, std=0.001, bias=0 
+
+roi_head.bbox_head.0.fc_reg.bias - torch.Size([4]): 
+NormalInit: mean=0, std=0.001, bias=0 
+
+roi_head.bbox_head.0.shared_fcs.0.weight - torch.Size([1024, 12544]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.0.shared_fcs.0.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.0.shared_fcs.1.weight - torch.Size([1024, 1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.0.shared_fcs.1.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.1.fc_cls.weight - torch.Size([9, 1024]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+roi_head.bbox_head.1.fc_cls.bias - torch.Size([9]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+roi_head.bbox_head.1.fc_reg.weight - torch.Size([4, 1024]): 
+NormalInit: mean=0, std=0.001, bias=0 
+
+roi_head.bbox_head.1.fc_reg.bias - torch.Size([4]): 
+NormalInit: mean=0, std=0.001, bias=0 
+
+roi_head.bbox_head.1.shared_fcs.0.weight - torch.Size([1024, 12544]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.1.shared_fcs.0.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.1.shared_fcs.1.weight - torch.Size([1024, 1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.1.shared_fcs.1.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.2.fc_cls.weight - torch.Size([9, 1024]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+roi_head.bbox_head.2.fc_cls.bias - torch.Size([9]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+roi_head.bbox_head.2.fc_reg.weight - torch.Size([4, 1024]): 
+NormalInit: mean=0, std=0.001, bias=0 
+
+roi_head.bbox_head.2.fc_reg.bias - torch.Size([4]): 
+NormalInit: mean=0, std=0.001, bias=0 
+
+roi_head.bbox_head.2.shared_fcs.0.weight - torch.Size([1024, 12544]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.2.shared_fcs.0.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.2.shared_fcs.1.weight - torch.Size([1024, 1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+
+roi_head.bbox_head.2.shared_fcs.1.bias - torch.Size([1024]): 
+XavierInit: gain=1, distribution=uniform, bias=0 
+2022-09-13 21:44:46,428 - mmdet - INFO - Automatic scaling of learning rate (LR) has been disabled.
+2022-09-13 21:44:46,449 - mmdet - INFO - load checkpoint from local path: /home/hhn/mmdetection/pretrained/cascade_rcnn_r50_fpn_1x_coco_20200316-3dc56deb.pth
+2022-09-13 21:44:46,771 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+size mismatch for roi_head.bbox_head.0.fc_cls.weight: copying a param with shape torch.Size([81, 1024]) from checkpoint, the shape in current model is torch.Size([9, 1024]).
+size mismatch for roi_head.bbox_head.0.fc_cls.bias: copying a param with shape torch.Size([81]) from checkpoint, the shape in current model is torch.Size([9]).
+size mismatch for roi_head.bbox_head.1.fc_cls.weight: copying a param with shape torch.Size([81, 1024]) from checkpoint, the shape in current model is torch.Size([9, 1024]).
+size mismatch for roi_head.bbox_head.1.fc_cls.bias: copying a param with shape torch.Size([81]) from checkpoint, the shape in current model is torch.Size([9]).
+size mismatch for roi_head.bbox_head.2.fc_cls.weight: copying a param with shape torch.Size([81, 1024]) from checkpoint, the shape in current model is torch.Size([9, 1024]).
+size mismatch for roi_head.bbox_head.2.fc_cls.bias: copying a param with shape torch.Size([81]) from checkpoint, the shape in current model is torch.Size([9]).
+2022-09-13 21:44:46,780 - mmdet - INFO - Start running, host: hhn@cv-8k3090, work_dir: /home/hhn/mmdetection/work_dirs/cascade_rcnn_r50_fpn
+2022-09-13 21:44:46,780 - mmdet - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) NumClassCheckHook                  
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) NumClassCheckHook                  
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2022-09-13 21:44:46,781 - mmdet - INFO - workflow: [('train', 1)], max: 12 epochs
+2022-09-13 21:44:46,781 - mmdet - INFO - Checkpoints will be saved to /home/hhn/mmdetection/work_dirs/cascade_rcnn_r50_fpn by HardDiskBackend.
+2022-09-13 21:45:47,731 - mmdet - INFO - Epoch [1][50/118]	lr: 1.978e-03, eta: 0:27:42, time: 1.217, data_time: 0.060, memory: 10514, loss_rpn_cls: 0.0908, loss_rpn_bbox: 0.0210, s0.loss_cls: 0.6430, s0.acc: 83.8647, s0.loss_bbox: 0.0811, s1.loss_cls: 0.3477, s1.acc: 82.1904, s1.loss_bbox: 0.0682, s2.loss_cls: 0.1715, s2.acc: 81.0718, s2.loss_bbox: 0.0251, loss: 1.4484
+2022-09-13 21:46:48,925 - mmdet - INFO - Epoch [1][100/118]	lr: 3.976e-03, eta: 0:26:46, time: 1.224, data_time: 0.016, memory: 10514, loss_rpn_cls: 0.0129, loss_rpn_bbox: 0.0157, s0.loss_cls: 0.1960, s0.acc: 94.0396, s0.loss_bbox: 0.0760, s1.loss_cls: 0.1199, s1.acc: 92.9033, s1.loss_bbox: 0.0867, s2.loss_cls: 0.0620, s2.acc: 94.0226, s2.loss_bbox: 0.0412, loss: 0.6105
+2022-09-13 21:47:10,034 - mmdet - INFO - Saving checkpoint at 1 epochs
+2022-09-13 21:47:42,138 - mmdet - INFO - Evaluating bbox...
+2022-09-13 21:47:42,553 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.166
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.285
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.150
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.179
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.078
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.117
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.258
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.258
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.258
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.232
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.143
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.196
+
+2022-09-13 21:47:42,554 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.000 | liewen   | 0.112 | huahen   | 0.202 |
+| baidian  | 0.218 | bengque  | 0.001 | zifu     | 0.793 |
+| wuzi     | 0.000 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 21:47:42,565 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 21:47:42,565 - mmdet - INFO - Epoch(val) [1][144]	bbox_mAP: 0.1660, bbox_mAP_50: 0.2850, bbox_mAP_75: 0.1500, bbox_mAP_s: 0.1790, bbox_mAP_m: 0.0780, bbox_mAP_l: 0.1170, bbox_mAP_copypaste: 0.166 0.285 0.150 0.179 0.078 0.117
+2022-09-13 21:48:46,134 - mmdet - INFO - Epoch [2][50/118]	lr: 6.693e-03, eta: 0:22:57, time: 1.269, data_time: 0.062, memory: 10514, loss_rpn_cls: 0.0073, loss_rpn_bbox: 0.0148, s0.loss_cls: 0.1353, s0.acc: 95.3374, s0.loss_bbox: 0.0738, s1.loss_cls: 0.0817, s1.acc: 94.3721, s1.loss_bbox: 0.0863, s2.loss_cls: 0.0462, s2.acc: 93.8599, s2.loss_bbox: 0.0422, loss: 0.4874
+2022-09-13 21:49:46,738 - mmdet - INFO - Epoch [2][100/118]	lr: 8.691e-03, eta: 0:22:32, time: 1.212, data_time: 0.015, memory: 10514, loss_rpn_cls: 0.0103, loss_rpn_bbox: 0.0156, s0.loss_cls: 0.1260, s0.acc: 95.6426, s0.loss_bbox: 0.0751, s1.loss_cls: 0.0712, s1.acc: 94.9968, s1.loss_bbox: 0.0923, s2.loss_cls: 0.0374, s2.acc: 94.8998, s2.loss_bbox: 0.0455, loss: 0.4735
+2022-09-13 21:50:08,335 - mmdet - INFO - Saving checkpoint at 2 epochs
+2022-09-13 21:50:36,132 - mmdet - INFO - Evaluating bbox...
+2022-09-13 21:50:36,747 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.217
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.356
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.213
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.160
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.113
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.192
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.350
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.350
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.350
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.198
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.200
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.310
+
+2022-09-13 21:50:36,748 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.156 | liewen   | 0.123 | huahen   | 0.249 |
+| baidian  | 0.202 | bengque  | 0.132 | zifu     | 0.874 |
+| wuzi     | 0.000 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 21:50:36,762 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 21:50:36,762 - mmdet - INFO - Epoch(val) [2][144]	bbox_mAP: 0.2170, bbox_mAP_50: 0.3560, bbox_mAP_75: 0.2130, bbox_mAP_s: 0.1600, bbox_mAP_m: 0.1130, bbox_mAP_l: 0.1920, bbox_mAP_copypaste: 0.217 0.356 0.213 0.160 0.113 0.192
+2022-09-13 21:51:40,152 - mmdet - INFO - Epoch [3][50/118]	lr: 1.141e-02, eta: 0:20:22, time: 1.266, data_time: 0.063, memory: 10514, loss_rpn_cls: 0.0062, loss_rpn_bbox: 0.0156, s0.loss_cls: 0.1221, s0.acc: 95.5278, s0.loss_bbox: 0.0751, s1.loss_cls: 0.0716, s1.acc: 94.6573, s1.loss_bbox: 0.0954, s2.loss_cls: 0.0379, s2.acc: 94.5399, s2.loss_bbox: 0.0476, loss: 0.4713
+2022-09-13 21:52:40,848 - mmdet - INFO - Epoch [3][100/118]	lr: 1.341e-02, eta: 0:19:49, time: 1.214, data_time: 0.015, memory: 10514, loss_rpn_cls: 0.0074, loss_rpn_bbox: 0.0150, s0.loss_cls: 0.1067, s0.acc: 96.0269, s0.loss_bbox: 0.0675, s1.loss_cls: 0.0599, s1.acc: 95.3876, s1.loss_bbox: 0.0832, s2.loss_cls: 0.0309, s2.acc: 95.3651, s2.loss_bbox: 0.0429, loss: 0.4134
+2022-09-13 21:53:02,472 - mmdet - INFO - Saving checkpoint at 3 epochs
+2022-09-13 21:53:31,328 - mmdet - INFO - Evaluating bbox...
+2022-09-13 21:53:31,717 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.280
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.449
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.275
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.099
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.124
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.263
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.403
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.403
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.403
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.130
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.201
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.384
+
+2022-09-13 21:53:31,718 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.221 | liewen   | 0.175 | huahen   | 0.287 |
+| baidian  | 0.240 | bengque  | 0.225 | zifu     | 0.886 |
+| wuzi     | 0.206 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 21:53:31,726 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 21:53:31,726 - mmdet - INFO - Epoch(val) [3][144]	bbox_mAP: 0.2800, bbox_mAP_50: 0.4490, bbox_mAP_75: 0.2750, bbox_mAP_s: 0.0990, bbox_mAP_m: 0.1240, bbox_mAP_l: 0.2630, bbox_mAP_copypaste: 0.280 0.449 0.275 0.099 0.124 0.263
+2022-09-13 21:54:34,724 - mmdet - INFO - Epoch [4][50/118]	lr: 1.612e-02, eta: 0:18:04, time: 1.258, data_time: 0.062, memory: 10514, loss_rpn_cls: 0.0058, loss_rpn_bbox: 0.0133, s0.loss_cls: 0.1002, s0.acc: 96.1646, s0.loss_bbox: 0.0665, s1.loss_cls: 0.0588, s1.acc: 95.4075, s1.loss_bbox: 0.0867, s2.loss_cls: 0.0308, s2.acc: 95.1946, s2.loss_bbox: 0.0444, loss: 0.4066
+2022-09-13 21:55:35,317 - mmdet - INFO - Epoch [4][100/118]	lr: 1.812e-02, eta: 0:17:25, time: 1.212, data_time: 0.016, memory: 10514, loss_rpn_cls: 0.0057, loss_rpn_bbox: 0.0144, s0.loss_cls: 0.1062, s0.acc: 96.0923, s0.loss_bbox: 0.0666, s1.loss_cls: 0.0641, s1.acc: 95.2710, s1.loss_bbox: 0.0878, s2.loss_cls: 0.0336, s2.acc: 94.9252, s2.loss_bbox: 0.0469, loss: 0.4253
+2022-09-13 21:55:57,018 - mmdet - INFO - Saving checkpoint at 4 epochs
+2022-09-13 21:56:26,398 - mmdet - INFO - Evaluating bbox...
+2022-09-13 21:56:26,893 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.286
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.454
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.293
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.186
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.128
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.259
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.392
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.392
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.392
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.295
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.235
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.353
+
+2022-09-13 21:56:26,894 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.267 | liewen   | 0.164 | huahen   | 0.292 |
+| baidian  | 0.234 | bengque  | 0.249 | zifu     | 0.879 |
+| wuzi     | 0.206 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 21:56:26,898 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 21:56:26,898 - mmdet - INFO - Epoch(val) [4][144]	bbox_mAP: 0.2860, bbox_mAP_50: 0.4540, bbox_mAP_75: 0.2930, bbox_mAP_s: 0.1860, bbox_mAP_m: 0.1280, bbox_mAP_l: 0.2590, bbox_mAP_copypaste: 0.286 0.454 0.293 0.186 0.128 0.259
+2022-09-13 21:57:30,724 - mmdet - INFO - Epoch [5][50/118]	lr: 2.000e-02, eta: 0:15:54, time: 1.275, data_time: 0.062, memory: 10514, loss_rpn_cls: 0.0060, loss_rpn_bbox: 0.0153, s0.loss_cls: 0.1021, s0.acc: 96.0713, s0.loss_bbox: 0.0671, s1.loss_cls: 0.0592, s1.acc: 95.3976, s1.loss_bbox: 0.0891, s2.loss_cls: 0.0312, s2.acc: 95.0864, s2.loss_bbox: 0.0473, loss: 0.4171
+2022-09-13 21:58:31,332 - mmdet - INFO - Epoch [5][100/118]	lr: 2.000e-02, eta: 0:15:11, time: 1.212, data_time: 0.015, memory: 10514, loss_rpn_cls: 0.0066, loss_rpn_bbox: 0.0134, s0.loss_cls: 0.0903, s0.acc: 96.5908, s0.loss_bbox: 0.0632, s1.loss_cls: 0.0535, s1.acc: 95.8528, s1.loss_bbox: 0.0839, s2.loss_cls: 0.0285, s2.acc: 95.4753, s2.loss_bbox: 0.0436, loss: 0.3831
+2022-09-13 21:58:53,055 - mmdet - INFO - Saving checkpoint at 5 epochs
+2022-09-13 21:59:21,632 - mmdet - INFO - Evaluating bbox...
+2022-09-13 21:59:22,123 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.270
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.439
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.264
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.192
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.142
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.236
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.400
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.400
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.400
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.299
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.269
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.359
+
+2022-09-13 21:59:22,124 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.337 | liewen   | 0.166 | huahen   | 0.251 |
+| baidian  | 0.218 | bengque  | 0.291 | zifu     | 0.898 |
+| wuzi     | 0.000 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 21:59:22,132 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 21:59:22,132 - mmdet - INFO - Epoch(val) [5][144]	bbox_mAP: 0.2700, bbox_mAP_50: 0.4390, bbox_mAP_75: 0.2640, bbox_mAP_s: 0.1920, bbox_mAP_m: 0.1420, bbox_mAP_l: 0.2360, bbox_mAP_copypaste: 0.270 0.439 0.264 0.192 0.142 0.236
+2022-09-13 22:00:25,021 - mmdet - INFO - Epoch [6][50/118]	lr: 2.000e-02, eta: 0:13:45, time: 1.256, data_time: 0.062, memory: 10514, loss_rpn_cls: 0.0047, loss_rpn_bbox: 0.0123, s0.loss_cls: 0.0914, s0.acc: 96.5298, s0.loss_bbox: 0.0646, s1.loss_cls: 0.0543, s1.acc: 95.8357, s1.loss_bbox: 0.0868, s2.loss_cls: 0.0300, s2.acc: 95.2287, s2.loss_bbox: 0.0506, loss: 0.3948
+2022-09-13 22:01:26,101 - mmdet - INFO - Epoch [6][100/118]	lr: 2.000e-02, eta: 0:13:00, time: 1.222, data_time: 0.015, memory: 10514, loss_rpn_cls: 0.0066, loss_rpn_bbox: 0.0154, s0.loss_cls: 0.0914, s0.acc: 96.5190, s0.loss_bbox: 0.0647, s1.loss_cls: 0.0532, s1.acc: 95.8118, s1.loss_bbox: 0.0858, s2.loss_cls: 0.0285, s2.acc: 95.4461, s2.loss_bbox: 0.0463, loss: 0.3920
+2022-09-13 22:01:48,424 - mmdet - INFO - Saving checkpoint at 6 epochs
+2022-09-13 22:02:15,942 - mmdet - INFO - Evaluating bbox...
+2022-09-13 22:02:16,392 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.293
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.469
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.285
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.184
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.145
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.274
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.413
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.413
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.413
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.219
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.207
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.387
+
+2022-09-13 22:02:16,392 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.350 | liewen   | 0.151 | huahen   | 0.280 |
+| baidian  | 0.280 | bengque  | 0.297 | zifu     | 0.880 |
+| wuzi     | 0.103 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 22:02:16,397 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 22:02:16,397 - mmdet - INFO - Epoch(val) [6][144]	bbox_mAP: 0.2930, bbox_mAP_50: 0.4690, bbox_mAP_75: 0.2850, bbox_mAP_s: 0.1840, bbox_mAP_m: 0.1450, bbox_mAP_l: 0.2740, bbox_mAP_copypaste: 0.293 0.469 0.285 0.184 0.145 0.274
+2022-09-13 22:03:20,101 - mmdet - INFO - Epoch [7][50/118]	lr: 2.000e-02, eta: 0:11:39, time: 1.272, data_time: 0.062, memory: 10514, loss_rpn_cls: 0.0056, loss_rpn_bbox: 0.0133, s0.loss_cls: 0.0774, s0.acc: 96.9629, s0.loss_bbox: 0.0589, s1.loss_cls: 0.0463, s1.acc: 96.4164, s1.loss_bbox: 0.0812, s2.loss_cls: 0.0257, s2.acc: 95.8566, s2.loss_bbox: 0.0471, loss: 0.3556
+2022-09-13 22:04:20,668 - mmdet - INFO - Epoch [7][100/118]	lr: 2.000e-02, eta: 0:10:51, time: 1.211, data_time: 0.015, memory: 10514, loss_rpn_cls: 0.0047, loss_rpn_bbox: 0.0134, s0.loss_cls: 0.0802, s0.acc: 96.7666, s0.loss_bbox: 0.0608, s1.loss_cls: 0.0477, s1.acc: 96.0827, s1.loss_bbox: 0.0846, s2.loss_cls: 0.0269, s2.acc: 95.4594, s2.loss_bbox: 0.0495, loss: 0.3678
+2022-09-13 22:04:42,899 - mmdet - INFO - Saving checkpoint at 7 epochs
+2022-09-13 22:05:11,053 - mmdet - INFO - Evaluating bbox...
+2022-09-13 22:05:11,389 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.296
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.487
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.290
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.174
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.158
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.258
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.400
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.400
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.400
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.252
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.244
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.361
+
+2022-09-13 22:05:11,390 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.366 | liewen   | 0.155 | huahen   | 0.287 |
+| baidian  | 0.228 | bengque  | 0.273 | zifu     | 0.883 |
+| wuzi     | 0.180 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 22:05:11,397 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 22:05:11,397 - mmdet - INFO - Epoch(val) [7][144]	bbox_mAP: 0.2960, bbox_mAP_50: 0.4870, bbox_mAP_75: 0.2900, bbox_mAP_s: 0.1740, bbox_mAP_m: 0.1580, bbox_mAP_l: 0.2580, bbox_mAP_copypaste: 0.296 0.487 0.290 0.174 0.158 0.258
+2022-09-13 22:06:15,397 - mmdet - INFO - Epoch [8][50/118]	lr: 2.000e-02, eta: 0:09:33, time: 1.278, data_time: 0.063, memory: 10514, loss_rpn_cls: 0.0031, loss_rpn_bbox: 0.0124, s0.loss_cls: 0.0750, s0.acc: 96.9946, s0.loss_bbox: 0.0568, s1.loss_cls: 0.0446, s1.acc: 96.4243, s1.loss_bbox: 0.0827, s2.loss_cls: 0.0252, s2.acc: 95.8513, s2.loss_bbox: 0.0519, loss: 0.3517
+2022-09-13 22:07:16,655 - mmdet - INFO - Epoch [8][100/118]	lr: 2.000e-02, eta: 0:08:44, time: 1.225, data_time: 0.016, memory: 10514, loss_rpn_cls: 0.0041, loss_rpn_bbox: 0.0120, s0.loss_cls: 0.0748, s0.acc: 97.0728, s0.loss_bbox: 0.0541, s1.loss_cls: 0.0445, s1.acc: 96.4776, s1.loss_bbox: 0.0797, s2.loss_cls: 0.0263, s2.acc: 95.6243, s2.loss_bbox: 0.0508, loss: 0.3463
+2022-09-13 22:07:39,080 - mmdet - INFO - Saving checkpoint at 8 epochs
+2022-09-13 22:08:07,926 - mmdet - INFO - Evaluating bbox...
+2022-09-13 22:08:08,275 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.301
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.493
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.319
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.179
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.138
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.285
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.406
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.406
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.406
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.224
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.219
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.388
+
+2022-09-13 22:08:08,276 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.380 | liewen   | 0.168 | huahen   | 0.266 |
+| baidian  | 0.236 | bengque  | 0.308 | zifu     | 0.845 |
+| wuzi     | 0.206 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 22:08:08,282 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 22:08:08,282 - mmdet - INFO - Epoch(val) [8][144]	bbox_mAP: 0.3010, bbox_mAP_50: 0.4930, bbox_mAP_75: 0.3190, bbox_mAP_s: 0.1790, bbox_mAP_m: 0.1380, bbox_mAP_l: 0.2850, bbox_mAP_copypaste: 0.301 0.493 0.319 0.179 0.138 0.285
+2022-09-13 22:09:12,069 - mmdet - INFO - Epoch [9][50/118]	lr: 2.000e-03, eta: 0:07:27, time: 1.274, data_time: 0.063, memory: 10514, loss_rpn_cls: 0.0029, loss_rpn_bbox: 0.0110, s0.loss_cls: 0.0613, s0.acc: 97.5215, s0.loss_bbox: 0.0494, s1.loss_cls: 0.0354, s1.acc: 97.1544, s1.loss_bbox: 0.0745, s2.loss_cls: 0.0209, s2.acc: 96.4193, s2.loss_bbox: 0.0476, loss: 0.3030
+2022-09-13 22:10:13,570 - mmdet - INFO - Epoch [9][100/118]	lr: 2.000e-03, eta: 0:06:37, time: 1.230, data_time: 0.016, memory: 10514, loss_rpn_cls: 0.0031, loss_rpn_bbox: 0.0094, s0.loss_cls: 0.0574, s0.acc: 97.6729, s0.loss_bbox: 0.0450, s1.loss_cls: 0.0348, s1.acc: 97.1684, s1.loss_bbox: 0.0714, s2.loss_cls: 0.0209, s2.acc: 96.4681, s2.loss_bbox: 0.0461, loss: 0.2880
+2022-09-13 22:10:35,803 - mmdet - INFO - Saving checkpoint at 9 epochs
+2022-09-13 22:10:59,047 - mmdet - INFO - Evaluating bbox...
+2022-09-13 22:10:59,477 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.337
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.523
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.343
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.213
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.164
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.321
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.436
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.436
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.436
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.277
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.266
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.410
+
+2022-09-13 22:10:59,478 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.473 | liewen   | 0.183 | huahen   | 0.320 |
+| baidian  | 0.245 | bengque  | 0.358 | zifu     | 0.886 |
+| wuzi     | 0.232 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 22:10:59,481 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 22:10:59,481 - mmdet - INFO - Epoch(val) [9][144]	bbox_mAP: 0.3370, bbox_mAP_50: 0.5230, bbox_mAP_75: 0.3430, bbox_mAP_s: 0.2130, bbox_mAP_m: 0.1640, bbox_mAP_l: 0.3210, bbox_mAP_copypaste: 0.337 0.523 0.343 0.213 0.164 0.321
+2022-09-13 22:12:02,762 - mmdet - INFO - Epoch [10][50/118]	lr: 2.000e-03, eta: 0:05:22, time: 1.264, data_time: 0.063, memory: 10514, loss_rpn_cls: 0.0026, loss_rpn_bbox: 0.0094, s0.loss_cls: 0.0526, s0.acc: 97.8096, s0.loss_bbox: 0.0418, s1.loss_cls: 0.0312, s1.acc: 97.4379, s1.loss_bbox: 0.0697, s2.loss_cls: 0.0197, s2.acc: 96.6226, s2.loss_bbox: 0.0493, loss: 0.2763
+2022-09-13 22:13:03,708 - mmdet - INFO - Epoch [10][100/118]	lr: 2.000e-03, eta: 0:04:31, time: 1.219, data_time: 0.016, memory: 10514, loss_rpn_cls: 0.0021, loss_rpn_bbox: 0.0088, s0.loss_cls: 0.0534, s0.acc: 97.8105, s0.loss_bbox: 0.0460, s1.loss_cls: 0.0317, s1.acc: 97.4286, s1.loss_bbox: 0.0732, s2.loss_cls: 0.0196, s2.acc: 96.6500, s2.loss_bbox: 0.0483, loss: 0.2832
+2022-09-13 22:13:26,180 - mmdet - INFO - Saving checkpoint at 10 epochs
+2022-09-13 22:13:48,880 - mmdet - INFO - Evaluating bbox...
+2022-09-13 22:13:49,179 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.331
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.522
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.346
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.205
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.159
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.315
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.426
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.426
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.426
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.273
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.261
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.398
+
+2022-09-13 22:13:49,180 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.474 | liewen   | 0.187 | huahen   | 0.321 |
+| baidian  | 0.243 | bengque  | 0.347 | zifu     | 0.873 |
+| wuzi     | 0.206 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 22:13:49,185 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 22:13:49,185 - mmdet - INFO - Epoch(val) [10][144]	bbox_mAP: 0.3310, bbox_mAP_50: 0.5220, bbox_mAP_75: 0.3460, bbox_mAP_s: 0.2050, bbox_mAP_m: 0.1590, bbox_mAP_l: 0.3150, bbox_mAP_copypaste: 0.331 0.522 0.346 0.205 0.159 0.315
+2022-09-13 22:14:52,799 - mmdet - INFO - Epoch [11][50/118]	lr: 2.000e-03, eta: 0:03:17, time: 1.271, data_time: 0.062, memory: 10514, loss_rpn_cls: 0.0021, loss_rpn_bbox: 0.0089, s0.loss_cls: 0.0500, s0.acc: 97.9800, s0.loss_bbox: 0.0423, s1.loss_cls: 0.0296, s1.acc: 97.5964, s1.loss_bbox: 0.0684, s2.loss_cls: 0.0188, s2.acc: 96.7839, s2.loss_bbox: 0.0453, loss: 0.2654
+2022-09-13 22:15:53,801 - mmdet - INFO - Epoch [11][100/118]	lr: 2.000e-03, eta: 0:02:25, time: 1.219, data_time: 0.016, memory: 10514, loss_rpn_cls: 0.0023, loss_rpn_bbox: 0.0088, s0.loss_cls: 0.0526, s0.acc: 97.8706, s0.loss_bbox: 0.0429, s1.loss_cls: 0.0316, s1.acc: 97.4541, s1.loss_bbox: 0.0699, s2.loss_cls: 0.0196, s2.acc: 96.6800, s2.loss_bbox: 0.0483, loss: 0.2759
+2022-09-13 22:16:14,846 - mmdet - INFO - Saving checkpoint at 11 epochs
+2022-09-13 22:16:47,939 - mmdet - INFO - Evaluating bbox...
+2022-09-13 22:16:48,236 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.324
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.522
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.327
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.196
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.156
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.311
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.413
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.413
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.413
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.257
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.245
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.391
+
+2022-09-13 22:16:48,237 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.427 | liewen   | 0.183 | huahen   | 0.335 |
+| baidian  | 0.229 | bengque  | 0.342 | zifu     | 0.870 |
+| wuzi     | 0.206 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 22:16:48,242 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 22:16:48,242 - mmdet - INFO - Epoch(val) [11][144]	bbox_mAP: 0.3240, bbox_mAP_50: 0.5220, bbox_mAP_75: 0.3270, bbox_mAP_s: 0.1960, bbox_mAP_m: 0.1560, bbox_mAP_l: 0.3110, bbox_mAP_copypaste: 0.324 0.522 0.327 0.196 0.156 0.311
+2022-09-13 22:17:51,810 - mmdet - INFO - Epoch [12][50/118]	lr: 2.000e-04, eta: 0:01:12, time: 1.270, data_time: 0.067, memory: 10514, loss_rpn_cls: 0.0026, loss_rpn_bbox: 0.0085, s0.loss_cls: 0.0508, s0.acc: 97.9316, s0.loss_bbox: 0.0411, s1.loss_cls: 0.0302, s1.acc: 97.5021, s1.loss_bbox: 0.0672, s2.loss_cls: 0.0188, s2.acc: 96.7601, s2.loss_bbox: 0.0485, loss: 0.2678
+2022-09-13 22:18:52,319 - mmdet - INFO - Epoch [12][100/118]	lr: 2.000e-04, eta: 0:00:19, time: 1.210, data_time: 0.020, memory: 10514, loss_rpn_cls: 0.0016, loss_rpn_bbox: 0.0082, s0.loss_cls: 0.0439, s0.acc: 98.2256, s0.loss_bbox: 0.0374, s1.loss_cls: 0.0269, s1.acc: 97.8271, s1.loss_bbox: 0.0629, s2.loss_cls: 0.0173, s2.acc: 96.9660, s2.loss_bbox: 0.0420, loss: 0.2403
+2022-09-13 22:19:14,883 - mmdet - INFO - Saving checkpoint at 12 epochs
+2022-09-13 22:19:43,331 - mmdet - INFO - Evaluating bbox...
+2022-09-13 22:19:43,656 - mmdet - INFO - 
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.330
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1000 ] = 0.525
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1000 ] = 0.329
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.217
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.161
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.314
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.424
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.424
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1000 ] = 0.424
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1000 ] = 0.276
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1000 ] = 0.257
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=1000 ] = 0.397
+
+2022-09-13 22:19:43,657 - mmdet - INFO - 
++----------+-------+----------+-------+----------+-------+
+| category | AP    | category | AP    | category | AP    |
++----------+-------+----------+-------+----------+-------+
+| pomo     | 0.443 | liewen   | 0.183 | huahen   | 0.338 |
+| baidian  | 0.241 | bengque  | 0.340 | zifu     | 0.887 |
+| wuzi     | 0.206 | louguang | 0.000 | None     | None  |
++----------+-------+----------+-------+----------+-------+
+2022-09-13 22:19:43,662 - mmdet - INFO - Exp name: cascade_rcnn_r50_fpn.py
+2022-09-13 22:19:43,662 - mmdet - INFO - Epoch(val) [12][144]	bbox_mAP: 0.3300, bbox_mAP_50: 0.5250, bbox_mAP_75: 0.3290, bbox_mAP_s: 0.2170, bbox_mAP_m: 0.1610, bbox_mAP_l: 0.3140, bbox_mAP_copypaste: 0.330 0.525 0.329 0.217 0.161 0.314
